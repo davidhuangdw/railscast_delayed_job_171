@@ -1,0 +1,41 @@
+        # monitor
+        gem 'delayed_job_web'
+        # routes
+          match "/delayed_job" => DelayedJobWeb, :anchor => false, via: [:get, :post]
+        # open: http://localhost:3000/delayed_job
+
+        # start background workers for delayed jobs
+        rake jobs:work
+
+        # example
+            @newsletter = Newsletter.find(params[:newsletter_id])
+            @newsletter.delay.deliver
+        class Newsletter
+          def deliver(id)
+            ...
+          end
+        end
+
+        # add job: enqueue from object.delay.method
+        object.delay(...options...).method
+        Delayed::Job.enqueue job, ...options...
+        handle_asynchronously :tweet_later, ...options...
+        # options:
+        queue:'...', run_at: 3.minutes.from_now
+        
+        # add custom job
+        NewsletterJob = Struct.new(:text, :emails) do
+          def perform
+            emails.each { |e| NewsletterMailer.deliver_text_to_email(text, e) }
+          end
+        end
+        Delayed::Job.enqueue NewsletterJob.new('lorem ipsum...', Customers.pluck(:email))
+
+
+        rails g delayed_job:active_record
+        rake db:migration
+
+        gem 'delayed_job_active_record'
+        gem 'delayed_job_web'       # for monitor
+        gem 'daemons'               # for 'bin/delayed_job start'== README
+

@@ -1,0 +1,14 @@
+%h1 Listing newsletters
+
+= link_to 'New Newsletter', new_newsletter_path
+
+- @newsletters.each do |newsletter|
+  %h3= newsletter.subject
+  - if newsletter.delevered_at.present?
+    %p= newsletter.delevered_at
+  %p
+    = link_to 'Show', newsletter
+    = link_to 'Edit', edit_newsletter_path(newsletter)
+    = link_to 'Destroy', newsletter, :method => :delete, :data => { :confirm => 'Are you sure?' }
+    = link_to 'Deliver', newsletter_deliver_path(newsletter)
+
